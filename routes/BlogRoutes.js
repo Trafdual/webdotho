@@ -1,9 +1,8 @@
 const express = require('express')
 const router = express.Router()
 const Blog = require('../models/blog.model')
-const unicode = require('unicode')
 const uploads = require('./upload')
-
+const unicode = require('unidecode')
 function removeSpecialChars (str) {
   const specialChars = /[:+,!@#$%^&*()\-?/]/g
 
