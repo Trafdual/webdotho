@@ -8,6 +8,7 @@ const cookieParser = require('cookie-parser')
 const sanphamroutes = require('./routes/SanPhamRoutes')
 const theloaiRoutes = require('./routes/theloaiRoutes')
 const thanhtoanroutes =require('./routes/ThanhToanRoutes')
+const blogroutes =require('./routes/BlogRoutes')
 
 const MongoStore = require('connect-mongo')
 
@@ -58,6 +59,7 @@ app.use(cors())
 app.use('/', theloaiRoutes)
 app.use('/', sanphamroutes)
 app.use('/',thanhtoanroutes)
+app.use('/',blogroutes)
 
 const port = process.env.PORT || 3010
 
