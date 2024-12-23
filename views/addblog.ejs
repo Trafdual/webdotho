@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+        <h2>
+            <a href="/main"><img style="width: 35px;" src="https://cdn-icons-png.flaticon.com/512/25/25694.png"></a>
+            Thêm blog</h2>
+
+        <form action="/postloaisp" method="post">
+
+            <br>
+            <label class="form-label">Tiêu để blog</label>
+            <input type="text" name="tieude_blog" class="form-control"><br>
+            <label class="form-label">Ảnh</label>
+            <input type="file" name="image" class="form-control"><br>
+            <label class="form-label">Nội dung</label>
+            <div id="editor-container" style="height: 400px;"></div>
+            <input type="hidden" name="noidung" id="editor-content">
+            <br>
+            <button type="submit" class="btn btn-danger">Thêm blog</button>
+        </form>
+        </form>
+        <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+        <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+        <script>
+            var quill = new Quill('#editor-container', {
+                theme: 'snow',
+                modules: {
+                    toolbar: {
+                        container: [
+                            [{
+                                'header': '1'
+                            }, {
+                                'header': '2'
+                            }],
+                            [{
+                                'font': []
+                            }],
+                            [{
+                                'list': 'ordered'
+                            }, {
+                                'list': 'bullet'
+                            }],
+                            ['bold', 'italic', 'underline'],
+                            ['link', 'image'],
+                            [{
+                                'align': []
+                            }],
+                            ['clean']
+                        ],
+                        handlers: {
+                            image: imageHandler
+                        }
+                    }
+                }
+            });
+
+            function imageHandler() {
+                var range = quill.getSelection();
+                var input = document.createElement('input');
+                input.setAttribute('type', 'file');
+                input.setAttribute('accept', 'image/*');
+                input.addEventListener('change', function() {
+                    var file = input.files[0];
+                    var formData = new FormData();
+                    formData.append('image', file);
+
+                    fetch('/upload', {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(result => {
+                            var url = result.url; // URL returned from server
+                            quill.insertEmbed(range.index, 'image', url);
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                });
+                input.click();
+            };
+
+            // Update hidden input with Quill content on form submission
+            document.querySelector('form').addEventListener('submit', function() {
+                var content = document.querySelector('#editor-content');
+                content.value = quill.root.innerHTML;
+            });
+        </script>
+    </div>
+</body>
+</html>
+

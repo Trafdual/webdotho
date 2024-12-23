@@ -153,4 +153,42 @@ router.get('/chitietsanpham/:tieude', async (req, res) => {
   }
 })
 
+router.post('/search', async (req, res) => {
+  try {
+    const { keyword } = req.body
+    if (!keyword) {
+      return res.status(400).json({ message: 'Keyword is required' })
+    }
+
+    const keywordNoAccents = removeSpecialChars(keyword)
+
+    const keywords = keyword.split(' ').map(removeSpecialChars)
+
+    const regex = keywords.map(word => new RegExp(word, 'i'))
+    console.log(regex)
+
+    const sanpham = await Chitietsp.ChitietSp.find({
+      $or: [
+        { name: { $regex: new RegExp(keyword, 'i') } },
+        { namekhongdau: { $regex: new RegExp(keywordNoAccents, 'i') } },
+        { namekhongdau: { $all: regex } }
+      ]
+    })
+
+    // Định dạng kết quả trả về
+    const sanphamjson = sanpham.map(sp => ({
+      _id: sp._id,
+      name: sp.name,
+      namekhongdau: sp.namekhongdau,
+      image: sp.image,
+      price: sp.price
+    }))
+
+    res.json(sanphamjson)
+  } catch (error) {
+    console.error(error)
+    res.status(500).send('Internal Server Error')
+  }
+})
+
 module.exports = router

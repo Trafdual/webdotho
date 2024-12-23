@@ -90,8 +90,7 @@ router.get('/getblog', async (req, res) => {
 router.get('/chitietblog/:tieude', async (req, res) => {
   try {
     const tieude = req.params.tieude
-    const tieude_khongdau = decodeURIComponent(tieude).replace(/-/g, ' ')
-    const blog = await Blog.blogModel.findOne({ tieude_khongdau })
+    const blog = await Blog.blogModel.findOne({ tieude_khongdau: tieude })
     res.json(blog)
   } catch (error) {
     console.error(error)
