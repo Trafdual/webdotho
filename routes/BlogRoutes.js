@@ -42,7 +42,15 @@ router.post(
 router.get('/getblog', async (req, res) => {
   try {
     const blog = await Blog.blogModel.find().lean()
-    res.json(blog)
+    const blogjson =  blog.map(bl =>{
+      return {
+        _id: bl._id,
+        tieude_blog: bl.tieude_blog,
+        tieude_khongdau: bl.tieude_khongdau,
+        img_blog: bl.img_blog
+      }
+    })
+    res.json(blogjson)
   } catch (error) {
     console.error(error)
     res.status(500).json({ message: `Đã xảy ra lỗi: ${error}` })
