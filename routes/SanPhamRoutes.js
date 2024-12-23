@@ -3,6 +3,13 @@ const router = express.Router()
 const TheLoai = require('../models/theloaiSpModel')
 const Chitietsp = require('../models/chitietSpModel')
 const uploads = require('./upload')
+const unicode = require('unidecode')
+
+function removeSpecialChars (str) {
+  const specialChars = /[:+,!@#$%^&*()\-?/]/g
+
+  return str.replace(specialChars, '')
+}
 
 router.get('/sanpham', async (req, res) => {
   try {
@@ -15,9 +22,9 @@ router.get('/sanpham', async (req, res) => {
             return {
               _id: sp1._id,
               name: sp1.name,
+              namekhongdau: sp1.namekhongdau,
               image: sp1.image,
-              price: sp1.price,
-              mota: sp1.mota
+              price: sp1.price
             }
           })
         )
@@ -29,6 +36,28 @@ router.get('/sanpham', async (req, res) => {
       })
     )
     res.json(theloaijson)
+  } catch (error) {
+    console.log(error)
+  }
+})
+router.get('/fullsanphham/:nametheloai', async (req, res) => {
+  try {
+    const nametheloai = req.params.nametheloai
+    const namekhongdau = decodeURIComponent(nametheloai).replace(/-/g, ' ')
+    const theloai = await TheLoai.theloaiSP.findOne({ namekhongdau })
+    const sanpham = await Promise.all(
+      theloai.chitietsp.map(async sp => {
+        const sp1 = await Chitietsp.ChitietSp.findById(sp._id)
+        return {
+          _id: sp1._id,
+          name: sp1.name,
+          namekhongdau: sp1.namekhongdau,
+          image: sp1.image,
+          price: sp1.price
+        }
+      })
+    )
+    res.json(sanpham)
   } catch (error) {
     console.log(error)
   }
@@ -71,10 +100,13 @@ router.post('/putsanpham/:idsanpham', async (req, res) => {
   try {
     const idsanpham = req.params.idsanpham
     const { name, price, mota } = req.body
+    const namekhongdau1 = unicode(name)
+    const namekhongdau = removeSpecialChars(namekhongdau1)
     const sanpham = await Chitietsp.ChitietSp.findById(idsanpham)
     sanpham.name = name
     sanpham.price = price
     sanpham.mota = mota
+    sanpham.namekhongdau = namekhongdau
     await sanpham.save()
     res.json(sanpham)
   } catch (error) {
@@ -97,10 +129,11 @@ router.post('/deletesanpham/:idsanpham', async (req, res) => {
     console.log(error)
   }
 })
-router.get('/chitietsanpham/:idsanpham', async (req, res) => {
+router.get('/chitietsanpham/:tieude', async (req, res) => {
   try {
-    const idsanpham = req.params.idsanpham
-    const sanpham = await Chitietsp.ChitietSp.findById(idsanpham)
+    const tieude = req.params.tieude
+    const namekhongdau = decodeURIComponent(tieude).replace(/-/g, ' ')
+    const sanpham = await Chitietsp.ChitietSp.findOne({ namekhongdau })
     const sanphamjson = {
       _id: sanpham._id,
       name: sanpham.name,
