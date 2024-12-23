@@ -15,7 +15,7 @@ router.post(
   async (req, res) => {
     try {
       const { tieude_blog, noidung } = req.body
-      const domain = 'http://localhost:8080'
+      const domain = 'https://baominh.shop'
 
       const image = req.files['image']
         ? `${domain}/${req.files['image'][0].filename}`

@@ -44,7 +44,7 @@ router.post(
       const { name, price, mota } = req.body
       const idtheloai = req.params.idtheloai
       const theloai = await TheLoai.theloaiSP.findById(idtheloai)
-      const domain = 'http://localhost:8080'
+      const domain = 'https://baominh.shop'
 
       const image = req.files['image']
         ? `${domain}/${req.files['image'][0].filename}`
