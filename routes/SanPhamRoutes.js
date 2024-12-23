@@ -6,9 +6,11 @@ const uploads = require('./upload')
 const unicode = require('unidecode')
 
 function removeSpecialChars (str) {
-  const specialChars = /[:+,!@#$%^&*()\-?/]/g
-
-  return str.replace(specialChars, '')
+  const specialChars = /[:+,!@#$%^&*()\-/?.\s]/g // Bao gồm cả dấu cách (\s)
+  return str
+    .replace(specialChars, '-') // Thay tất cả ký tự đặc biệt và dấu cách bằng dấu -
+    .replace(/-+/g, '-') // Loại bỏ dấu - thừa (nhiều dấu liền nhau chỉ còn 1)
+    .replace(/^-|-$/g, '') // Loại bỏ dấu - ở đầu hoặc cuối chuỗi
 }
 
 router.get('/sanpham', async (req, res) => {
@@ -40,11 +42,12 @@ router.get('/sanpham', async (req, res) => {
     console.log(error)
   }
 })
-router.get('/fullsanphham/:nametheloai', async (req, res) => {
+router.get('/san-pham/:nametheloai', async (req, res) => {
   try {
     const nametheloai = req.params.nametheloai
-    const namekhongdau = decodeURIComponent(nametheloai).replace(/-/g, ' ')
-    const theloai = await TheLoai.theloaiSP.findOne({ namekhongdau })
+    const theloai = await TheLoai.theloaiSP.findOne({
+      namekhongdau: nametheloai
+    })
     const sanpham = await Promise.all(
       theloai.chitietsp.map(async sp => {
         const sp1 = await Chitietsp.ChitietSp.findById(sp._id)
@@ -71,6 +74,9 @@ router.post(
   async (req, res) => {
     try {
       const { name, price, mota } = req.body
+      const namekhongdau1 = unicode(name)
+      const namekhongdau = removeSpecialChars(namekhongdau1)
+
       const idtheloai = req.params.idtheloai
       const theloai = await TheLoai.theloaiSP.findById(idtheloai)
       const domain = 'https://baominh.shop'
@@ -84,7 +90,8 @@ router.post(
         image,
         price,
         mota,
-        idloaisp: theloai._id
+        idloaisp: theloai._id,
+        namekhongdau
       })
       theloai.chitietsp.push(sanpham._id)
       await sanpham.save()
@@ -132,8 +139,7 @@ router.post('/deletesanpham/:idsanpham', async (req, res) => {
 router.get('/chitietsanpham/:tieude', async (req, res) => {
   try {
     const tieude = req.params.tieude
-    const namekhongdau = decodeURIComponent(tieude).replace(/-/g, ' ')
-    const sanpham = await Chitietsp.ChitietSp.findOne({ namekhongdau })
+    const sanpham = await Chitietsp.ChitietSp.findOne({ namekhongdau: tieude })
     const sanphamjson = {
       _id: sanpham._id,
       name: sanpham.name,

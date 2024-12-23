@@ -4,9 +4,11 @@ const Blog = require('../models/blog.model')
 const uploads = require('./upload')
 const unicode = require('unidecode')
 function removeSpecialChars (str) {
-  const specialChars = /[:+,!@#$%^&*()\-?/]/g
-
-  return str.replace(specialChars, '')
+  const specialChars = /[:+,!@#$%^&*()\-/?.\s]/g // Bao gồm cả dấu cách (\s)
+  return str
+    .replace(specialChars, '-') // Thay tất cả ký tự đặc biệt và dấu cách bằng dấu -
+    .replace(/-+/g, '-') // Loại bỏ dấu - thừa (nhiều dấu liền nhau chỉ còn 1)
+    .replace(/^-|-$/g, '') // Loại bỏ dấu - ở đầu hoặc cuối chuỗi
 }
 
 router.post(
