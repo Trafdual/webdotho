@@ -59,12 +59,12 @@ app.use('/', theloaiRoutes)
 app.use('/', sanphamroutes)
 app.use('/',thanhtoanroutes)
 
-const port = process.env.PORT || 8080
+const port = process.env.PORT || 3010
 
 app.listen(port, () => {
   try {
-    console.log('kết nối thành công 8080')
+    console.log('kết nối thành công 3010')
   } catch (error) {
-    console.log('kết nối thất bại 8080', error)
+    console.log('kết nối thất bại 3010', error)
   }
 })
