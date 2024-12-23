@@ -12,12 +12,10 @@ function removeSpecialChars (str) {
 
 router.post(
   '/postblog',
-  uploads.fields([
-    { name: 'image', maxCount: 1 } // Một ảnh duy nhất
-  ]),
+  uploads.fields([{ name: 'image', maxCount: 1 }]),
   async (req, res) => {
     try {
-      const { tieude_blog } = req.body
+      const { tieude_blog, noidung } = req.body
       const domain = 'http://localhost:8080'
 
       const image = req.files['image']
@@ -29,7 +27,8 @@ router.post(
       const blog = new Blog.blogModel({
         tieude_blog,
         tieude_khongdau,
-        img_blog: image
+        img_blog: image,
+        noidung
       })
       await blog.save()
       res.json(blog)
@@ -39,10 +38,40 @@ router.post(
     }
   }
 )
+
+router.post('/putblog/:idblog', async (req, res) => {
+  try {
+    const idblog = req.params.idblog
+    const { tieude_blog, noidung } = req.body
+    const tieude_khongdau1 = unicode(tieude_blog)
+    const tieude_khongdau = removeSpecialChars(tieude_khongdau1)
+    const blog = await Blog.blogModel.findById(idblog)
+    blog.tieude_blog = tieude_blog
+    blog.tieude_khongdau = tieude_khongdau
+    blog.noidung = noidung
+    await blog.save()
+    res.json(blog)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ message: `Đã xảy ra lỗi: ${error}` })
+  }
+})
+
+router.post('/deleteblog/:idblog', async (req, res) => {
+  try {
+    const idblog = req.params.idblog
+    await Blog.blogModel.findByIdAndDelete(idblog)
+    res.json({ message: 'Xóa thành công' })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ message: `Đã xảy ra lỗi: ${error}` })
+  }
+})
+
 router.get('/getblog', async (req, res) => {
   try {
     const blog = await Blog.blogModel.find().lean()
-    const blogjson =  blog.map(bl =>{
+    const blogjson = blog.map(bl => {
       return {
         _id: bl._id,
         tieude_blog: bl.tieude_blog,
