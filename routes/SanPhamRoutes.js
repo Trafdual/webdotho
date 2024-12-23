@@ -17,13 +17,7 @@ router.get('/sanpham', async (req, res) => {
               name: sp1.name,
               image: sp1.image,
               price: sp1.price,
-              manhinh: sp1.manhinh,
-              chip: sp1.chip,
-              ram: sp1.ram,
-              pinsac: sp1.pinsac,
-              congsac: sp1.congsac,
-              thongtin: sp1.thongtin,
-              dungluong: sp1.dungluong
+              mota: sp1.mota
             }
           })
         )
@@ -99,6 +93,22 @@ router.post('/deletesanpham/:idsanpham', async (req, res) => {
     await Chitietsp.ChitietSp.findByIdAndDelete(idsanpham)
     await theloai.save()
     res.json({ message: 'xóa thành công' })
+  } catch (error) {
+    console.log(error)
+  }
+})
+router.get('/:idsanpham', async (req, res) => {
+  try {
+    const idsanpham = req.params.idsanpham
+    const sanpham = await Chitietsp.ChitietSp.findById(idsanpham)
+    const sanphamjson = {
+      _id: sanpham._id,
+      name: sanpham.name,
+      image: sanpham.image,
+      price: sanpham.price,
+      mota: sanpham.mota
+    }
+    res.json(sanphamjson)
   } catch (error) {
     console.log(error)
   }
