@@ -69,7 +69,7 @@ router.post('/deleteblog/:idblog', async (req, res) => {
 
 router.get('/getblog', async (req, res) => {
   try {
-    const blog = await Blog.blogModel.find().lean()
+    const blog = await Blog.blogModel.find().lean() // Tìm tất cả blog
     const blogjson = blog.map(bl => {
       return {
         _id: bl._id,
@@ -78,18 +78,18 @@ router.get('/getblog', async (req, res) => {
         img_blog: bl.img_blog
       }
     })
-    res.json(blogjson)
+    res.json(blogjson) // Trả về danh sách blog
   } catch (error) {
     console.error(error)
     res.status(500).json({ message: `Đã xảy ra lỗi: ${error}` })
   }
 })
 
-router.get('/:tieude', async (req, res) => {
+router.get('/chitietblog/:tieude', async (req, res) => {
   try {
     const tieude = req.params.tieude
     const tieude_khongdau = decodeURIComponent(tieude).replace(/-/g, ' ')
-    const blog = await Blog.blogModel.findOne({ tieude_khongdau }).lean()
+    const blog = await Blog.blogModel.findOne({ tieude_khongdau })
     res.json(blog)
   } catch (error) {
     console.error(error)

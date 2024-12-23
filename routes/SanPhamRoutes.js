@@ -97,7 +97,7 @@ router.post('/deletesanpham/:idsanpham', async (req, res) => {
     console.log(error)
   }
 })
-router.get('/:idsanpham', async (req, res) => {
+router.get('/chitietsanpham/:idsanpham', async (req, res) => {
   try {
     const idsanpham = req.params.idsanpham
     const sanpham = await Chitietsp.ChitietSp.findById(idsanpham)
