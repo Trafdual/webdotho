@@ -77,7 +77,8 @@ router.get('/getblog', async (req, res) => {
         _id: bl._id,
         tieude_blog: bl.tieude_blog,
         tieude_khongdau: bl.tieude_khongdau,
-        img_blog: bl.img_blog
+        img_blog: bl.img_blog,
+        noidung:bl.noidung
       }
     })
     res.json(blogjson) // Trả về danh sách blog
