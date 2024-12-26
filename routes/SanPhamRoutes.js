@@ -60,7 +60,11 @@ router.get('/san-pham/:nametheloai', async (req, res) => {
         }
       })
     )
-    res.json(sanpham)
+    const sanphamjson = {
+      nametheloai:theloai.name,
+      sanpham: sanpham
+    }
+    res.json(sanphamjson)
   } catch (error) {
     console.log(error)
   }
@@ -162,9 +166,7 @@ router.get('/chitietsanpham/:tieude', async (req, res) => {
   try {
     const tieude = req.params.tieude
     const sanpham = await Chitietsp.ChitietSp.findOne({ namekhongdau: tieude })
-    const theloai = await TheLoai.theloaiSP.findById(sanpham.idloaisp)
     const sanphamjson = {
-      nametheloai: theloai.name,
       _id: sanpham._id,
       name: sanpham.name,
       image: sanpham.image,
