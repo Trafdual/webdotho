@@ -98,4 +98,16 @@ router.get('/chitietblog/:tieude', async (req, res) => {
   }
 })
 
+router.post('/upload', uploads.single('image'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded' })
+  }
+  const fileUrl = `https://baominh.shop/${req.file.filename}`
+  res.json({ url: fileUrl })
+})
+
+router.get('/getaddblog',async(req,res)=>{
+  res.render('addblog')
+})
+
 module.exports = router
