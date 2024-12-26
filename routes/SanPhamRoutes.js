@@ -60,6 +60,32 @@ router.get('/san-pham/:nametheloai', async (req, res) => {
         }
       })
     )
+    const sanphamjson = {
+      nametheloai:theloai.name,
+      sanpham: sanpham
+    }
+    res.json(sanphamjson)
+  } catch (error) {
+    console.log(error)
+  }
+})
+
+router.get('/getsanpham/:idtheloai', async (req, res) => {
+  try {
+    const idtheloai = req.params.idtheloai
+    const theloai = await TheLoai.theloaiSP.findById(idtheloai)
+    const sanpham = await Promise.all(
+      theloai.chitietsp.map(async sp => {
+        const sp1 = await Chitietsp.ChitietSp.findById(sp._id)
+        return {
+          _id: sp1._id,
+          name: sp1.name,
+          namekhongdau: sp1.namekhongdau,
+          image: sp1.image,
+          price: sp1.price
+        }
+      })
+    )
     res.json(sanpham)
   } catch (error) {
     console.log(error)
@@ -175,7 +201,6 @@ router.post('/search', async (req, res) => {
       ]
     })
 
-    // Định dạng kết quả trả về
     const sanphamjson = sanpham.map(sp => ({
       _id: sp._id,
       name: sp.name,
