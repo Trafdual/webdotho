@@ -129,30 +129,6 @@ router.post(
   }
 )
 
-router.post('/putsanpham/:idsanpham', async (req, res) => {
-  try {
-    const idsanpham = req.params.idsanpham
-    const { name, price, mota } = req.body
-    const namekhongdau1 = unicode(name)
-    const namekhongdau = removeSpecialChars(namekhongdau1)
-    const sanpham = await Chitietsp.ChitietSp.findById(idsanpham)
-    const domain = 'https://demovemaybay.shop'
-
-    const image = req.files['image']
-      ? `${domain}/${req.files['image'][0].filename}`
-      : null
-    sanpham.image = image
-    sanpham.name = name
-    sanpham.price = price
-    sanpham.mota = mota
-    sanpham.namekhongdau = namekhongdau
-    await sanpham.save()
-    res.json(sanpham)
-  } catch (error) {
-    console.log(error)
-  }
-})
-
 router.post(
   '/putsanpham/:idsanpham',
   uploads.fields([
@@ -161,14 +137,13 @@ router.post(
   async (req, res) => {
     try {
       const idsanpham = req.params.idsanpham
-      const { name, price, mota } = req.body
-      const namekhongdau1 = unicode(name)
-      const namekhongdau = removeSpecialChars(namekhongdau1)
       const sanpham = await Chitietsp.ChitietSp.findById(idsanpham)
-      sanpham.name = name
-      sanpham.price = price
-      sanpham.mota = mota
-      sanpham.namekhongdau = namekhongdau
+      const domain = 'https://demovemaybay.shop'
+
+      const image = req.files['image']
+        ? `${domain}/${req.files['image'][0].filename}`
+        : null
+      sanpham.image = image
       await sanpham.save()
       res.json(sanpham)
     } catch (error) {
