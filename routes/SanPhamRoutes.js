@@ -61,7 +61,7 @@ router.get('/san-pham/:nametheloai', async (req, res) => {
       })
     )
     const sanphamjson = {
-      nametheloai:theloai.name,
+      nametheloai: theloai.name,
       sanpham: sanpham
     }
     res.json(sanphamjson)
@@ -105,7 +105,7 @@ router.post(
 
       const idtheloai = req.params.idtheloai
       const theloai = await TheLoai.theloaiSP.findById(idtheloai)
-      const domain = 'https://baominh.shop'
+      const domain = 'https://demovemaybay.shop'
 
       const image = req.files['image']
         ? `${domain}/${req.files['image'][0].filename}`
@@ -136,6 +136,12 @@ router.post('/putsanpham/:idsanpham', async (req, res) => {
     const namekhongdau1 = unicode(name)
     const namekhongdau = removeSpecialChars(namekhongdau1)
     const sanpham = await Chitietsp.ChitietSp.findById(idsanpham)
+    const domain = 'https://demovemaybay.shop'
+
+    const image = req.files['image']
+      ? `${domain}/${req.files['image'][0].filename}`
+      : null
+    sanpham.image = image
     sanpham.name = name
     sanpham.price = price
     sanpham.mota = mota
@@ -146,6 +152,30 @@ router.post('/putsanpham/:idsanpham', async (req, res) => {
     console.log(error)
   }
 })
+
+router.post(
+  '/putsanpham/:idsanpham',
+  uploads.fields([
+    { name: 'image', maxCount: 1 } // Một ảnh duy nhất
+  ]),
+  async (req, res) => {
+    try {
+      const idsanpham = req.params.idsanpham
+      const { name, price, mota } = req.body
+      const namekhongdau1 = unicode(name)
+      const namekhongdau = removeSpecialChars(namekhongdau1)
+      const sanpham = await Chitietsp.ChitietSp.findById(idsanpham)
+      sanpham.name = name
+      sanpham.price = price
+      sanpham.mota = mota
+      sanpham.namekhongdau = namekhongdau
+      await sanpham.save()
+      res.json(sanpham)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+)
 
 router.post('/deletesanpham/:idsanpham', async (req, res) => {
   try {
@@ -213,6 +243,35 @@ router.post('/search', async (req, res) => {
   } catch (error) {
     console.error(error)
     res.status(500).send('Internal Server Error')
+  }
+})
+
+router.post('/putanhsanpham', async (req, res) => {
+  try {
+    // Tìm tất cả sản phẩm có ảnh chứa domain cũ
+    const sanphams = await Chitietsp.ChitietSp.find({
+      image: { $regex: '^https://demovemaybay.shop/' }
+    })
+
+    if (sanphams.length === 0) {
+      return res.json({ message: 'Không có sản phẩm nào cần cập nhật.' })
+    }
+
+    // Lặp qua từng sản phẩm để cập nhật ảnh mới
+    for (let sanpham of sanphams) {
+      sanpham.image = sanpham.image.replace(
+        'https://demovemaybay.shop/',
+        'https://demovemaybay.shop/'
+      )
+      await sanpham.save() // Lưu thay đổi vào database
+    }
+
+    res.json({ message: `Đã cập nhật ${sanphams.length} sản phẩm.` })
+  } catch (error) {
+    console.error(error)
+    res
+      .status(500)
+      .json({ message: 'Đã xảy ra lỗi khi cập nhật ảnh sản phẩm.' })
   }
 })
 

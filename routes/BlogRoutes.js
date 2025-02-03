@@ -17,7 +17,7 @@ router.post(
   async (req, res) => {
     try {
       const { tieude_blog, noidung } = req.body
-      const domain = 'https://baominh.shop'
+      const domain = 'https://demovemaybay.shop'
 
       const image = req.files['image']
         ? `${domain}/${req.files['image'][0].filename}`
@@ -78,7 +78,7 @@ router.get('/getblog', async (req, res) => {
         tieude_blog: bl.tieude_blog,
         tieude_khongdau: bl.tieude_khongdau,
         img_blog: bl.img_blog,
-        noidung:bl.noidung
+        noidung: bl.noidung
       }
     })
     res.json(blogjson) // Trả về danh sách blog
@@ -103,11 +103,11 @@ router.post('/upload', uploads.single('image'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded' })
   }
-  const fileUrl = `https://baominh.shop/${req.file.filename}`
+  const fileUrl = `https://demovemaybay.shop/${req.file.filename}`
   res.json({ url: fileUrl })
 })
 
-router.get('/getaddblog',async(req,res)=>{
+router.get('/getaddblog', async (req, res) => {
   res.render('addblog')
 })
 
